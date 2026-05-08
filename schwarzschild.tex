@@ -1,0 +1,864 @@
+% ============================================================
+%  Where Do Black Holes Come From?
+%  Schwarzschild's Solution to Einstein's Field Equations
+% ============================================================
+
+\documentclass[12pt]{article}
+
+% --------------- Packages ---------------
+\usepackage{fontspec}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{unicode-math}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems,skins,breakable}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{physics}
+\usepackage{cancel}
+
+% --------------- Theorem-like environments ---------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{remark}
+\newtheorem{exercise}{Exercise}[section]
+
+% --------------- Exercise box environment ---------------
+\newtcolorbox[auto counter]{exbox}[1][]{
+  colback=gray!5,colframe=gray!75!black,fonttitle=\bfseries,
+  title={Exercise~\thetcbcounter},breakable,enhanced,#1
+}
+
+% --------------- Fancy header ---------------
+\pagestyle{fancy}
+\setlength{\headheight}{14pt}
+\fancyhead[L]{\small Schwarzschild's Solution to the EFE}
+\fancyhead[R]{\small \thepage}
+\fancyfoot[C]{}
+
+% --------------- Title ---------------
+\title{
+  \vspace{-1.5cm}
+  {\huge \textbf{Where Do Black Holes Come From?}}\\[0.5em]
+  {\Large An In-Depth Investigation of Schwarzschild's Solution\\[0.3em]
+   to Einstein's Field Equations}\\[1em]
+  {\large With Workbook and Exercises}
+}
+\author{}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\newpage
+\tableofcontents
+\newpage
+
+% ============================================================
+%  CHAPTER 1: HISTORICAL BACKGROUND
+% ============================================================
+\section{Historical Background}
+
+\subsection{The Genesis of General Relativity}
+
+In November 1915, Albert Einstein presented the final form of his general theory of relativity to the Prussian Academy of Sciences in Berlin. After nearly a decade of struggle, he had arrived at the field equations that relate the curvature of spacetime to the distribution of matter and energy:
+
+\begin{equation}\label{eq:efe}
+  R_{\mu\nu} - \frac{1}{2}g_{\mu\nu}R = \frac{8\pi G}{c^{4}} T_{\mu\nu}
+\end{equation}
+
+These equations were a monumental achievement. Where Newtonian gravity described a force acting instantaneously across space, Einstein's theory reimagined gravity as geometry---the curvature of a four-dimensional spacetime manifold. Matter tells spacetime how to curve; spacetime tells matter how to move.
+
+Einstein himself believed that exact solutions to his highly nonlinear equations would be difficult---perhaps impossible---to obtain. He was wrong.
+
+\subsection{Karl Schwarzschild and the First Exact Solution}
+
+Less than two months after Einstein's publication, the first exact solution to the field equations appeared. Its author was Karl Schwarzschild (1873--1916), a German physicist and astronomer serving as an artillery officer on the Russian front during the First World War.
+
+Schwarzschild read Einstein's papers while stationed in the field. Despite harsh conditions and failing health (he would die of pemphigus in May 1916, just months after his discovery), he derived the exact spacetime geometry outside a spherically symmetric, non-rotating mass distribution. He communicated his result to Einstein, who presented it to the Prussian Academy on 13 January 1916.
+
+Einstein's reply captures the significance of the moment:
+
+\begin{quote}
+\itshape
+``I had not expected that one could formulate the exact solution of the problem in such a simple way.''
+\end{quote}
+
+\subsection{The Schwarzschild Metric}
+
+Schwarzschild's solution describes the gravitational field outside any spherically symmetric, static body. In modern notation (using the coordinate choice popularized by Hilbert, 1917), it reads:
+
+\begin{equation}\label{eq:schwarzschild}
+  ds^{2} = -\left(1 - \frac{2GM}{c^{2}r}\right)c^{2}dt^{2}
+           + \left(1 - \frac{2GM}{c^{2}r}\right)^{-1}dr^{2}
+           + r^{2}\big(d\theta^{2} + \sin^{2}\theta\,d\phi^{2}\big)
+\end{equation}
+
+Throughout this document we use \textbf{geometric units}, setting $G = c = 1$, which simplifies the metric to:
+
+\begin{equation}\label{eq:schwarzschild-gu}
+  ds^{2} = -\left(1 - \frac{2M}{r}\right)dt^{2}
+           + \left(1 - \frac{2M}{r}\right)^{-1}dr^{2}
+           + r^{2}\,d\Omega^{2}
+\end{equation}
+
+where $d\Omega^{2} \equiv d\theta^{2} + \sin^{2}\theta\,d\phi^{2}$ is the metric on the unit 2-sphere, and $M$ is the mass of the central body.
+
+\subsection{From Solution to Black Hole}
+
+When Schwarzschild published his solution, the term ``black hole'' did not exist. The strange properties of the surface $r = 2M$---now called the Schwarzschild radius or event horizon---were only gradually understood over the following decades. It was not until the 1960s (with the work of Kruskal, Szekeres, Penrose, Wheeler, and others) that the full implications of the Schwarzschild geometry were appreciated.
+
+This document walks through the derivation of Schwarzschild's solution step by step. Along the way, we explore the mathematical machinery of general relativity and the physical properties of the resulting spacetime. Exercises throughout provide opportunities to deepen your understanding and develop computational fluency.
+
+% ============================================================
+%  CHAPTER 2: MATHEMATICAL PRELIMINARIES
+% ============================================================
+\section{Mathematical Preliminaries}
+
+\subsection{Manifolds and Metrics}
+
+General relativity is formulated on a \textbf{pseudo-Riemannian manifold}---a smooth, four-dimensional space equipped with a metric tensor $g_{\mu\nu}$ of Lorentzian signature $(-,+,+,+)$. The metric determines the invariant interval between two nearby events:
+
+\begin{equation}
+  ds^{2} = g_{\mu\nu}\,dx^{\mu}dx^{\nu}
+\end{equation}
+
+Throughout this document we employ the Einstein summation convention: repeated upper and lower indices are summed over $0,1,2,3$ (or $t,r,\theta,\phi$ in spherical coordinates).
+
+The inverse metric $g^{\mu\nu}$ satisfies $g^{\mu\rho}g_{\rho\nu} = \delta^{\mu}_{\ \nu}$.
+
+\subsection{Covariant Derivative and Connection}
+
+The \textbf{Christoffel symbols} (connection coefficients) encode how basis vectors change from point to point in a curved manifold. In a coordinate basis they are given by:
+
+\begin{equation}\label{eq:christoffel}
+  \Gamma^{\mu}_{\ \nu\rho} = \frac{1}{2}g^{\mu\sigma}\big(
+    \partial_{\nu}g_{\rho\sigma} + \partial_{\rho}g_{\nu\sigma} - \partial_{\sigma}g_{\nu\rho}
+  \big)
+\end{equation}
+
+The Christoffel symbols are symmetric in their lower indices: $\Gamma^{\mu}_{\nu\rho} = \Gamma^{\mu}_{\rho\nu}$.
+
+The \textbf{covariant derivative} of a vector field $V^{\mu}$ is:
+
+\begin{equation}
+  \nabla_{\nu}V^{\mu} = \partial_{\nu}V^{\mu} + \Gamma^{\mu}_{\ \nu\rho}V^{\rho}
+\end{equation}
+
+For a covector (one-form) $\omega_{\mu}$:
+
+\begin{equation}
+  \nabla_{\nu}\omega_{\mu} = \partial_{\nu}\omega_{\mu} - \Gamma^{\rho}_{\ \nu\mu}\omega_{\rho}
+\end{equation}
+
+\subsection{Geodesics}
+
+A \textbf{geodesic} is the curved-spacetime analogue of a straight line. Test particles follow timelike geodesics; light rays follow null geodesics. The geodesic equation is:
+
+\begin{equation}\label{eq:geodesic}
+  \frac{d^{2}x^{\mu}}{d\lambda^{2}} + \Gamma^{\mu}_{\ \nu\rho}\frac{dx^{\nu}}{d\lambda}\frac{dx^{\rho}}{d\lambda} = 0
+\end{equation}
+
+where $\lambda$ is an affine parameter (proper time $\tau$ for massive particles).
+
+\subsection{The Riemann Curvature Tensor}
+
+The \textbf{Riemann curvature tensor} measures the failure of second covariant derivatives to commute. In a coordinate basis:
+
+\begin{equation}\label{eq:riemann}
+  R^{\mu}_{\ \nu\rho\sigma} = \partial_{\rho}\Gamma^{\mu}_{\ \nu\sigma}
+    - \partial_{\sigma}\Gamma^{\mu}_{\ \nu\rho}
+    + \Gamma^{\mu}_{\ \alpha\rho}\Gamma^{\alpha}_{\ \nu\sigma}
+    - \Gamma^{\mu}_{\ \alpha\sigma}\Gamma^{\alpha}_{\ \nu\rho}
+\end{equation}
+
+The Riemann tensor has the following symmetries:
+\begin{align}
+  R_{\mu\nu\rho\sigma} &= -R_{\nu\mu\rho\sigma} &
+  R_{\mu\nu\rho\sigma} &= -R_{\mu\nu\sigma\rho} \\
+  R_{\mu\nu\rho\sigma} &= R_{\rho\sigma\mu\nu} &
+  R_{\mu[\nu\rho\sigma]} &= 0 \quad \text{(Bianchi identity)}
+\end{align}
+
+\subsection{The Ricci Tensor and Scalar}
+
+Contracting the Riemann tensor yields the \textbf{Ricci tensor}:
+
+\begin{equation}\label{eq:ricci}
+  R_{\mu\nu} \equiv R^{\rho}_{\ \mu\rho\nu}
+  = \partial_{\rho}\Gamma^{\rho}_{\ \mu\nu} - \partial_{\nu}\Gamma^{\rho}_{\ \mu\rho}
+    + \Gamma^{\rho}_{\ \mu\nu}\Gamma^{\sigma}_{\ \rho\sigma}
+    - \Gamma^{\sigma}_{\ \mu\rho}\Gamma^{\rho}_{\ \nu\sigma}
+\end{equation}
+
+The \textbf{Ricci scalar} (curvature scalar) is the trace of the Ricci tensor:
+
+\begin{equation}
+  R \equiv g^{\mu\nu}R_{\mu\nu}
+\end{equation}
+
+\subsection{The Einstein Tensor}
+
+The \textbf{Einstein tensor} combines the Ricci tensor and scalar into a divergence-free quantity:
+
+\begin{equation}\label{eq:einstein-tensor}
+  G_{\mu\nu} \equiv R_{\mu\nu} - \frac{1}{2}g_{\mu\nu}R
+\end{equation}
+
+It satisfies the contracted Bianchi identity $\nabla^{\mu}G_{\mu\nu} = 0$, which ensures energy--momentum conservation in the field equations.
+
+\subsection{Spherical Symmetry and Static Spacetimes}
+
+A spacetime is \textbf{spherically symmetric} if it admits three linearly independent spacelike Killing vectors that generate the rotation group $SO(3)$. In suitable coordinates $(t, r, \theta, \phi)$, the most general spherically symmetric line element is:
+
+\begin{equation}\label{eq:spherical-general}
+  ds^{2} = -e^{2\alpha(t,r)}dt^{2} + e^{2\beta(t,r)}dr^{2} + r^{2}d\Omega^{2}
+\end{equation}
+
+where $\alpha(t,r)$ and $\beta(t,r)$ are arbitrary functions.
+
+A spacetime is \textbf{stationary} if it admits a timelike Killing vector $\partial_{t}$. It is \textbf{static} if, in addition, it is invariant under time reversal $t \to -t$, which forces the metric to be diagonal. For a static, spherically symmetric spacetime, $\alpha$ and $\beta$ are functions of $r$ alone:
+
+\begin{equation}\label{eq:static-spherical}
+  ds^{2} = -e^{2\alpha(r)}dt^{2} + e^{2\beta(r)}dr^{2} + r^{2}d\Omega^{2}
+\end{equation}
+
+This is our starting point for the Schwarzschild derivation.
+
+% ============================================================
+%  CHAPTER 3: EINSTEIN'S FIELD EQUATIONS
+% ============================================================
+\section{Einstein's Field Equations}
+
+\subsection{The Full Field Equations}
+
+The Einstein field equations in the presence of matter are:
+
+\begin{equation}\label{eq:efe-full}
+  G_{\mu\nu} = R_{\mu\nu} - \frac{1}{2}g_{\mu\nu}R = 8\pi T_{\mu\nu}
+\end{equation}
+
+where $T_{\mu\nu}$ is the stress--energy tensor. In geometric units ($G=c=1$), the constant is $8\pi$ (in SI units it would be $8\pi G/c^{4}$).
+
+\subsection{The Vacuum Equations}
+
+The Schwarzschild solution describes the \textbf{exterior} of a mass distribution---the region where $T_{\mu\nu} = 0$. In vacuum, the field equations reduce to:
+
+\begin{equation}\label{eq:efe-vacuum}
+  R_{\mu\nu} - \frac{1}{2}g_{\mu\nu}R = 0
+\end{equation}
+
+Taking the trace (contracting with $g^{\mu\nu}$) gives $R - 2R = -R = 0$, so $R = 0$. Substituting back, we obtain the simpler vacuum equations:
+
+\begin{equation}\label{eq:ricci-vacuum}
+  R_{\mu\nu} = 0
+\end{equation}
+
+Thus, solving the Schwarzschild problem amounts to finding $\alpha(r)$ and $\beta(r)$ such that \textbf{all components of the Ricci tensor vanish}.
+
+\subsection{Counting the Equations}
+
+In four dimensions, $R_{\mu\nu}$ has 16 components, but due to symmetry ($R_{\mu\nu} = R_{\nu\mu}$), only 10 are independent. For a static, spherically symmetric metric (diagonal, with $\alpha$ and $\beta$ depending only on $r$), the only potentially non-zero components of $R_{\mu\nu}$ are $R_{tt}$, $R_{rr}$, $R_{\theta\theta}$, and $R_{\phi\phi}$.
+
+Moreover, spherical symmetry guarantees $R_{\phi\phi} = \sin^{2}\theta\,R_{\theta\theta}$, so we need only three independent equations for the two unknown functions $\alpha(r)$ and $\beta(r)$. Two of the equations give a relation between $\alpha$ and $\beta$; the third determines their functional form.
+
+% ============================================================
+%  CHAPTER 4: DERIVATION
+% ============================================================
+\section{Derivation of the Schwarzschild Solution}
+
+\subsection{The Metric Ansatz}
+
+We begin with the most general static, spherically symmetric line element:
+
+\begin{equation}\label{eq:ansatz}
+  ds^{2} = -e^{2\alpha(r)}dt^{2} + e^{2\beta(r)}dr^{2} + r^{2}\big(d\theta^{2} + \sin^{2}\theta\,d\phi^{2}\big)
+\end{equation}
+
+The non-zero metric components are:
+\begin{equation}
+  g_{tt} = -e^{2\alpha},\quad
+  g_{rr} = e^{2\beta},\quad
+  g_{\theta\theta} = r^{2},\quad
+  g_{\phi\phi} = r^{2}\sin^{2}\theta
+\end{equation}
+
+with inverse components:
+\begin{equation}
+  g^{tt} = -e^{-2\alpha},\quad
+  g^{rr} = e^{-2\beta},\quad
+  g^{\theta\theta} = \frac{1}{r^{2}},\quad
+  g^{\phi\phi} = \frac{1}{r^{2}\sin^{2}\theta}
+\end{equation}
+
+\subsection{Christoffel Symbols}
+
+Using equation~\eqref{eq:christoffel}, we compute the non-zero Christoffel symbols. Primes denote derivatives with respect to $r$: $\alpha' \equiv d\alpha/dr$, $\beta' \equiv d\beta/dr$.
+
+\begin{align}
+  \Gamma^{t}_{\ tr} = \Gamma^{t}_{\ rt} &= \alpha' \\[4pt]
+  \Gamma^{r}_{\ tt} &= \alpha'\,e^{2\alpha-2\beta} \\[4pt]
+  \Gamma^{r}_{\ rr} &= \beta' \\[4pt]
+  \Gamma^{r}_{\ \theta\theta} &= -r\,e^{-2\beta} \\[4pt]
+  \Gamma^{r}_{\ \phi\phi} &= -r\sin^{2}\theta\,e^{-2\beta} \\[4pt]
+  \Gamma^{\theta}_{\ r\theta} = \Gamma^{\theta}_{\ \theta r} &= \frac{1}{r} \\[4pt]
+  \Gamma^{\theta}_{\ \phi\phi} &= -\sin\theta\cos\theta \\[4pt]
+  \Gamma^{\phi}_{\ r\phi} = \Gamma^{\phi}_{\ \phi r} &= \frac{1}{r} \\[4pt]
+  \Gamma^{\phi}_{\ \theta\phi} = \Gamma^{\phi}_{\ \phi\theta} &= \cot\theta
+\end{align}
+
+All remaining Christoffel symbols vanish.
+
+\begin{exbox}[label=ex:christoffel]
+  Verify three of the Christoffel symbols above using equation~\eqref{eq:christoffel}.
+  Choose one symbol with only $r$ indices, one mixing $t$ and $r$, and one involving
+  angular coordinates.
+\end{exbox}
+
+\subsection{Contracted Christoffel Symbols}
+
+For use in the Ricci tensor formula~\eqref{eq:ricci}, we need $\Gamma^{\rho}_{\ \mu\rho}$:
+
+\begin{align}
+  \Gamma^{\rho}_{\ t\rho} &= \alpha' \\
+  \Gamma^{\rho}_{\ r\rho} &= \alpha' + \beta' + \frac{2}{r} \\
+  \Gamma^{\rho}_{\ \theta\rho} &= \cot\theta \\
+  \Gamma^{\rho}_{\ \phi\rho} &= 0
+\end{align}
+
+\subsection{The Ricci Tensor Components}
+
+We now compute each non-zero component of $R_{\mu\nu}$ using equation~\eqref{eq:ricci}.
+
+\subsubsection{The \texorpdfstring{$R_{tt}$}{R\_tt} Component}
+
+\begin{align}
+  R_{tt} &= \partial_{\rho}\Gamma^{\rho}_{\ tt} - \cancelto{0}{\partial_{t}\Gamma^{\rho}_{\ t\rho}}
+           + \Gamma^{\rho}_{\ tt}\Gamma^{\sigma}_{\ \rho\sigma}
+           - \Gamma^{\sigma}_{\ t\rho}\Gamma^{\rho}_{\ t\sigma} \\[4pt]
+  &= \partial_{r}\big(\alpha' e^{2\alpha-2\beta}\big)
+     + \Gamma^{r}_{\ tt}\Gamma^{\sigma}_{\ r\sigma}
+     - 2\,\Gamma^{t}_{\ tr}\Gamma^{r}_{\ tt} \\[4pt]
+  &= \big(\alpha'' + 2\alpha'^{2} - 2\alpha'\beta'\big)e^{2\alpha-2\beta}
+     + \big(\alpha' e^{2\alpha-2\beta}\big)\Big(\alpha' + \beta' + \frac{2}{r}\Big)
+     - 2\alpha'\big(\alpha' e^{2\alpha-2\beta}\big) \\[4pt]
+  &= e^{2\alpha-2\beta}\Big[\alpha'' + \alpha'^{2} - \alpha'\beta' + \frac{2\alpha'}{r}\Big]
+\end{align}
+
+Setting $R_{tt} = 0$ (vacuum) yields:
+
+\begin{equation}\label{eq:Rtt-zero}
+  \boxed{\;\alpha'' + \alpha'^{2} - \alpha'\beta' + \frac{2\alpha'}{r} = 0\;}
+\end{equation}
+
+\subsubsection{The \texorpdfstring{$R_{rr}$}{R\_rr} Component}
+
+\begin{align}
+  R_{rr} &= \partial_{\rho}\Gamma^{\rho}_{\ rr} - \partial_{r}\Gamma^{\rho}_{\ r\rho}
+           + \Gamma^{\rho}_{\ rr}\Gamma^{\sigma}_{\ \rho\sigma}
+           - \Gamma^{\sigma}_{\ r\rho}\Gamma^{\rho}_{\ r\sigma} \\[4pt]
+  &= \beta'' - \Big(\alpha'' + \beta'' - \frac{2}{r^{2}}\Big)
+     + \beta'\Big(\alpha' + \beta' + \frac{2}{r}\Big)
+     - \Big(\alpha'^{2} + \beta'^{2} + \frac{2}{r^{2}}\Big) \\[4pt]
+  &= -\alpha'' - \alpha'^{2} + \alpha'\beta' + \frac{2\beta'}{r}
+\end{align}
+
+Setting $R_{rr} = 0$ yields:
+
+\begin{equation}\label{eq:Rrr-zero}
+  \boxed{\;\alpha'' + \alpha'^{2} - \alpha'\beta' - \frac{2\beta'}{r} = 0\;}
+\end{equation}
+
+\subsubsection{Combining \texorpdfstring{$R_{tt}$ and $R_{rr}$}{R\_tt and R\_rr}}
+
+Subtracting equation~\eqref{eq:Rrr-zero} from equation~\eqref{eq:Rtt-zero}:
+
+\begin{equation}
+  \Big(\cancel{\alpha''} + \cancel{\alpha'^{2}} - \cancel{\alpha'\beta'} + \frac{2\alpha'}{r}\Big)
+  - \Big(\cancel{\alpha''} + \cancel{\alpha'^{2}} - \cancel{\alpha'\beta'} - \frac{2\beta'}{r}\Big) = 0
+\end{equation}
+
+\begin{equation}\label{eq:alpha-beta-relation}
+  \boxed{\;\frac{2\alpha'}{r} + \frac{2\beta'}{r} = 0 \;\Longrightarrow\; \alpha' + \beta' = 0\;}
+\end{equation}
+
+Integrating, $\alpha(r) + \beta(r) = \text{constant}$. As $r \to \infty$, we require the spacetime to be \textbf{asymptotically flat}---the metric should approach the Minkowski metric. Hence $\alpha(r), \beta(r) \to 0$ as $r \to \infty$, forcing the integration constant to zero:
+
+\begin{equation}\label{eq:beta-equals-minus-alpha}
+  \boxed{\;\beta(r) = -\alpha(r)\;}
+\end{equation}
+
+This simplifies the metric to:
+\begin{equation}
+  ds^{2} = -e^{2\alpha(r)}dt^{2} + e^{-2\alpha(r)}dr^{2} + r^{2}d\Omega^{2}
+\end{equation}
+
+\subsubsection{The \texorpdfstring{$R_{\theta\theta}$}{R\_thetatheta} Component}
+
+\begin{align}
+  R_{\theta\theta} &= \partial_{r}\Gamma^{r}_{\ \theta\theta} - \partial_{\theta}\Gamma^{\rho}_{\ \theta\rho}
+                     + \Gamma^{r}_{\ \theta\theta}\Gamma^{\sigma}_{\ r\sigma}
+                     - \Gamma^{\sigma}_{\ \theta\rho}\Gamma^{\rho}_{\ \theta\sigma} \\[4pt]
+  &= \partial_{r}\big(-r e^{-2\beta}\big) - \partial_{\theta}\big(\cot\theta\big) \\
+  &\quad + \big(-r e^{-2\beta}\big)\Big(\alpha' + \beta' + \frac{2}{r}\Big)
+     - \big[(-r e^{-2\beta})\tfrac{1}{r} + \tfrac{1}{r}(-r e^{-2\beta}) + \cot^{2}\theta\big] \nonumber \\[4pt]
+  &= \big(-e^{-2\beta} + 2r\beta' e^{-2\beta}\big) + \csc^{2}\theta
+     - r e^{-2\beta}\alpha' - r e^{-2\beta}\beta' - 2e^{-2\beta}
+     + 2e^{-2\beta} - \cot^{2}\theta \\[4pt]
+  &= e^{-2\beta}\big[r(\beta' - \alpha') - 1\big] + 1
+\end{align}
+
+Setting $R_{\theta\theta} = 0$ and substituting $\beta = -\alpha$ (so $\beta' = -\alpha'$, $e^{-2\beta} = e^{2\alpha}$):
+
+\begin{align}
+  e^{2\alpha}\big[r(-\alpha' - \alpha') - 1\big] + 1 &= 0 \\
+  e^{2\alpha}\big[-2r\alpha' - 1\big] + 1 &= 0 \\
+  e^{2\alpha}\big[1 + 2r\alpha'\big] &= 1
+\end{align}
+
+Recognizing the left-hand side as a total derivative:
+
+\begin{equation}\label{eq:total-derivative}
+  \boxed{\;\frac{d}{dr}\!\Big(re^{2\alpha}\Big) = 1\;}
+\end{equation}
+
+\subsubsection{Solving for \texorpdfstring{$\alpha(r)$}{alpha(r)}}
+
+Integrating~\eqref{eq:total-derivative}:
+
+\begin{equation}
+  re^{2\alpha} = r - 2M
+\end{equation}
+
+where $-2M$ is the integration constant. The sign and magnitude are chosen so that the Newtonian limit ($r \gg M$) recovers the familiar gravitational potential $\Phi = -M/r$ (see Section~5.1). Thus:
+
+\begin{equation}
+  e^{2\alpha} = 1 - \frac{2M}{r}
+\end{equation}
+
+and consequently:
+
+\begin{equation}
+  e^{2\beta} = e^{-2\alpha} = \left(1 - \frac{2M}{r}\right)^{-1}
+\end{equation}
+
+\subsection{The Schwarzschild Metric}
+
+Assembling the pieces, we obtain:
+
+\begin{equation}\label{eq:schwarzschild-final}
+  \boxed{\;
+  ds^{2} = -\left(1 - \frac{2M}{r}\right)dt^{2}
+           + \left(1 - \frac{2M}{r}\right)^{-1}dr^{2}
+           + r^{2}\big(d\theta^{2} + \sin^{2}\theta\,d\phi^{2}\big)
+  \;}
+\end{equation}
+
+This is the \textbf{Schwarzschild metric} in Schwarzschild (areal) coordinates. It is the unique static, spherically symmetric, asymptotically flat vacuum solution to Einstein's equations---a fact that follows from \textbf{Birkhoff's theorem} (see Section~\ref{sec:birkhoff}).
+
+\subsection{The \texorpdfstring{$R_{\phi\phi}$}{R\_phiphi} Component}
+
+For completeness, $R_{\phi\phi} = \sin^{2}\theta\,R_{\theta\theta}$, so $R_{\phi\phi} = 0$ follows automatically from $R_{\theta\theta} = 0$. No additional constraints arise.
+
+% ============================================================
+%  CHAPTER 5: PHYSICAL PROPERTIES
+% ============================================================
+\section{Physical Properties of the Schwarzschild Solution}
+
+\subsection{The Newtonian Limit}\label{sec:newtonian}
+
+For a slowly moving test particle far from the central mass ($r \gg M$), the geodesic equation reduces to Newton's law of gravitation if we identify $M$ with the mass. Specifically, from the $tt$-component of the metric:
+
+\begin{equation}
+  g_{tt} = -\left(1 - \frac{2M}{r}\right) = -\left(1 + \frac{2\Phi(r)}{c^{2}}\right)
+\end{equation}
+
+where $\Phi(r) = -GM/r$ is the Newtonian potential. In geometric units ($c=1$), $\Phi = -M/r$, confirming the interpretation of $M$ as the gravitational mass.
+
+\subsection{The Schwarzschild Radius}
+
+The metric component $g_{tt}$ vanishes at:
+
+\begin{equation}\label{eq:schwarzschild-radius}
+  r_{s} \equiv 2M
+\end{equation}
+
+and $g_{rr}$ diverges there. This surface defines the \textbf{event horizon} of a Schwarzschild black hole. In SI units:
+
+\begin{equation}
+  r_{s} = \frac{2GM}{c^{2}}
+\end{equation}
+
+For a solar-mass object ($M_{\odot} \approx 2 \times 10^{30}$ kg), $r_{s} \approx 2.95$ km.
+
+\begin{exbox}[label=ex:rs-calculation]
+  Compute the Schwarzschild radius in kilometers for: (a) the Sun ($M_{\odot}$),
+  (b) the Earth ($M_{\oplus} \approx 6\times 10^{24}$ kg),
+  (c) a proton ($m_{p} \approx 1.67\times 10^{-27}$ kg).
+\end{exbox}
+
+\subsection{Coordinate vs.\ Physical Singularity}
+
+The divergence of $g_{rr}$ at $r = 2M$ is a \textbf{coordinate singularity}---an artifact of the coordinate choice, not a true physical singularity. This can be verified by computing the \textbf{Kretschmann scalar}:
+
+\begin{equation}
+  \mathcal{K} \equiv R^{\mu\nu\rho\sigma}R_{\mu\nu\rho\sigma}
+               = \frac{48M^{2}}{r^{6}}
+\end{equation}
+
+$\mathcal{K}$ is perfectly finite at $r = 2M$, confirming that spacetime is regular there. At $r = 0$, however, $\mathcal{K}$ diverges---this is the true \textbf{curvature singularity}.
+
+\subsection{Time Dilation and Gravitational Redshift}
+
+Consider a stationary observer at fixed $(r,\theta,\phi)$. Their proper time interval $d\tau$ is related to the coordinate time interval $dt$ by:
+
+\begin{equation}
+  d\tau = \sqrt{1 - \frac{2M}{r}}\,dt
+\end{equation}
+
+For two stationary observers at radii $r_{1}$ and $r_{2}$ ($r_{2} > r_{1}$), the ratio of proper times is:
+
+\begin{equation}
+  \frac{d\tau_{1}}{d\tau_{2}} = \sqrt{\frac{1 - 2M/r_{1}}{1 - 2M/r_{2}}}
+\end{equation}
+
+A light signal emitted at $r_{1}$ and observed at $r_{2} \to \infty$ is \textbf{redshifted}:
+
+\begin{equation}\label{eq:redshift}
+  \frac{\lambda_{\infty}}{\lambda_{\text{em}}} = \frac{1}{\sqrt{1 - 2M/r_{1}}}
+\end{equation}
+
+As $r_{1} \to 2M$, the redshift diverges---light from the horizon is infinitely redshifted to an external observer.
+
+\subsection{Geodesics in the Schwarzschild Spacetime}
+
+The geodesic equation~\eqref{eq:geodesic} yields the equations of motion for test particles. Because of the spherical symmetry, we may (without loss of generality) restrict motion to the equatorial plane $\theta = \pi/2$.
+
+Two conserved quantities emerge from the Killing vectors $\partial_{t}$ and $\partial_{\phi}$:
+
+\begin{align}
+  E &\equiv \left(1 - \frac{2M}{r}\right)\frac{dt}{d\lambda}
+      &&\text{(energy per unit mass)} \\[4pt]
+  L &\equiv r^{2}\frac{d\phi}{d\lambda}
+      &&\text{(angular momentum per unit mass)}
+\end{align}
+
+For massive particles ($\lambda = \tau$), the normalization $g_{\mu\nu}u^{\mu}u^{\nu} = -1$ yields:
+
+\begin{equation}\label{eq:orbital-eq}
+  \frac{1}{2}\left(\frac{dr}{d\tau}\right)^{2} + V_{\text{eff}}(r) = \frac{E^{2} - 1}{2}
+\end{equation}
+
+where the \textbf{effective potential} is:
+
+\begin{equation}\label{eq:eff-potential}
+  V_{\text{eff}}(r) = -\frac{M}{r} + \frac{L^{2}}{2r^{2}} - \frac{ML^{2}}{r^{3}}
+\end{equation}
+
+The three terms represent: (1) the Newtonian gravitational potential, (2) the centrifugal barrier, and (3) a relativistic correction proportional to $1/r^{3}$ that is absent in Newtonian gravity.
+
+\subsubsection{Circular Orbits}
+
+Circular orbits occur at extrema of $V_{\text{eff}}$:
+\begin{equation}
+  \frac{dV_{\text{eff}}}{dr}\bigg|_{r=r_{c}} = 0
+  \;\Longrightarrow\;
+  Mr_{c}^{2} - L^{2}r_{c} + 3ML^{2} = 0
+\end{equation}
+
+Solving for $L^{2}$:
+\begin{equation}
+  L^{2} = \frac{Mr_{c}^{2}}{r_{c} - 3M}
+\end{equation}
+
+Circular orbits exist only for $r_{c} > 3M$. At $r_{c} = 3M$ (the photon sphere), $L \to \infty$---only massless particles can orbit there. The \textbf{innermost stable circular orbit} (ISCO) occurs where the second derivative vanishes, giving:
+
+\begin{equation}
+  r_{\text{ISCO}} = 6M
+\end{equation}
+
+\subsubsection{Precession of Perihelion}
+
+For elliptical orbits, the $\theta$ equation can be integrated to obtain $\phi$ as a function of $r$. The perihelion advance per revolution is:
+
+\begin{equation}\label{eq:perihelion}
+  \Delta\phi = \frac{6\pi M}{a(1-e^{2})}
+\end{equation}
+
+where $a$ is the semi-major axis and $e$ is the eccentricity. For Mercury, this gives $\Delta\phi \approx 43''$ per century---the famous anomaly that Einstein explained in 1915.
+
+\subsection{Birkhoff's Theorem}\label{sec:birkhoff}
+
+\begin{theorem}[Birkhoff, 1923]
+  Any spherically symmetric solution of the vacuum Einstein equations must be static
+  and is necessarily given by the Schwarzschild metric.
+\end{theorem}
+
+In other words: a spherically symmetric gravitational field in vacuum is \emph{necessarily} the Schwarzschild field, even if the source is time-dependent (as long as the symmetry is maintained). This is the general-relativistic analogue of the Newtonian result that the gravitational field outside a spherically symmetric mass distribution depends only on the total mass, not on its radial distribution or time evolution.
+
+\subsection{Kruskal--Szekeres Extension}
+
+The coordinate singularity at $r = 2M$ can be removed by transforming to \textbf{Kruskal--Szekeres coordinates} $(T, X)$:
+
+\begin{align}
+  T &= \sqrt{\frac{r}{2M} - 1}\,e^{r/4M}\sinh\!\left(\frac{t}{4M}\right) \\
+  X &= \sqrt{\frac{r}{2M} - 1}\,e^{r/4M}\cosh\!\left(\frac{t}{4M}\right)
+\end{align}
+
+In these coordinates the metric becomes:
+
+\begin{equation}
+  ds^{2} = \frac{32M^{3}}{r}e^{-r/2M}\big(-dT^{2} + dX^{2}\big) + r^{2}d\Omega^{2}
+\end{equation}
+
+which is manifestly regular at $r = 2M$. The Kruskal diagram reveals the full analytic structure: four regions (exterior, interior, white hole, parallel universe) separated by the horizon.
+
+% ============================================================
+%  CHAPTER 6: WORKBOOK EXERCISES
+% ============================================================
+\section{Workbook Exercises}
+
+The following exercises are designed to build fluency with the concepts and techniques
+presented in the preceding chapters. \textbf{Warm-up} problems test conceptual
+understanding. \textbf{Derivation} problems develop computational skill with the tensor
+machinery. \textbf{Application} problems explore physical consequences of the
+Schwarzschild solution.
+
+\subsection*{Warm-up Exercises}
+
+\begin{exbox}[label=ex:warmup1]
+  Explain in your own words what physical assumptions (symmetries, boundary conditions)
+  go into the derivation of the Schwarzschild metric. Why are we justified in assuming
+  the metric is static rather than merely stationary?
+\end{exbox}
+
+\begin{exbox}[label=ex:warmup2]
+  The Schwarzschild metric has two ``special'' radii: $r = 0$ and $r = 2M$.
+  Explain the difference between the singularities at these locations. How
+  can we determine which is a true singularity and which is a coordinate
+  artifact?
+\end{exbox}
+
+\begin{exbox}[label=ex:warmup3]
+  State Birkhoff's theorem. Why is it important? What Newtonian theorem
+  does it generalize?
+\end{exbox}
+
+\begin{exbox}[label=ex:warmup4]
+  What does it mean for a spacetime to be \textbf{asymptotically flat}?
+  Write down the mathematical condition and explain how it is used to
+  fix the integration constants in the Schwarzschild derivation.
+\end{exbox}
+
+\begin{exbox}[label=ex:warmup5]
+  In a few sentences, explain why the Schwarzschild solution requires \emph{no}
+  cosmological constant $\Lambda$. If we included $\Lambda \neq 0$, how would the
+  derivation change? (The result is called the Schwarzschild--de Sitter or
+  Kottler metric.)
+\end{exbox}
+
+\subsection*{Derivation Exercises}
+
+\begin{exbox}[label=ex:derive1]
+  Using equation~\eqref{eq:christoffel}, compute $\Gamma^{r}_{tt}$ and $\Gamma^{t}_{tr}$
+  directly from the metric ansatz~\eqref{eq:ansatz}. Show all steps.
+\end{exbox}
+
+\begin{exbox}[label=ex:derive2]
+  Verify that $\Gamma^{\theta}_{r\theta} = 1/r$ and $\Gamma^{\phi}_{\theta\phi} = \cot\theta$.
+  Why are these connections independent of $\alpha(r)$ and $\beta(r)$?
+\end{exbox}
+
+\begin{exbox}[label=ex:derive3]
+  Compute the contracted Christoffel symbols $\Gamma^{\rho}_{t\rho}$ and $\Gamma^{\rho}_{r\rho}$
+  explicitly. Each is a sum of four terms; list them.
+\end{exbox}
+
+\begin{exbox}[label=ex:derive4]
+  Show that the relation $\alpha' + \beta' = 0$ follows from $R_{tt} = R_{rr} = 0$.
+  Explain why the integration constant must be zero.
+\end{exbox}
+
+\begin{exbox}[label=ex:derive5]
+  Derive equation~\eqref{eq:total-derivative} from the $R_{\theta\theta}$ condition.
+  Then solve the differential equation $\frac{d}{dr}(re^{2\alpha}) = 1$ and apply
+  the boundary condition at infinity to obtain $e^{2\alpha} = 1 - 2M/r$.
+\end{exbox}
+
+\begin{exbox}[label=ex:derive6]
+  \textbf{The Kretschmann scalar.} Compute $R_{\mu\nu\rho\sigma}$ for the Schwarzschild
+  metric and verify that:
+  \begin{equation*}
+    R^{\mu\nu\rho\sigma}R_{\mu\nu\rho\sigma} = \frac{48M^{2}}{r^{6}}
+  \end{equation*}
+  \textit{Hint: Use the symmetries of the Riemann tensor to reduce the number of
+  independent components. For Schwarzschild, the non-zero components are proportional
+  to $M/r^{3}$.}
+\end{exbox}
+
+\begin{exbox}[label=ex:derive7]
+  Consider a spherically symmetric metric where \emph{time} is treated on the same
+  footing as space:
+  \begin{equation*}
+    ds^{2} = -e^{2\Phi(r)}dt^{2} + e^{2\Lambda(r)}dr^{2} + r^{2}d\Omega^{2}
+  \end{equation*}
+  (This is just a relabeling of $\alpha \to \Phi$, $\beta \to \Lambda$---common in
+  the literature.) Re-derive equations~\eqref{eq:Rtt-zero} and~\eqref{eq:Rrr-zero}
+  using this notation. Confirm they match.
+\end{exbox}
+
+\begin{exbox}[label=ex:derive8]
+  Show that the Schwarzschild metric remains a solution to $R_{\mu\nu} = 0$ even if
+  we perform the coordinate transformation $r \to \rho$ where $\rho = \int^{r}
+  e^{\beta(r')}dr'$ (isotropic radial coordinate). What is the spatial part of the
+  metric in isotropic coordinates?
+\end{exbox}
+
+\subsection*{Application Exercises}
+
+\begin{exbox}[label=ex:app1]
+  \textbf{Deflection of light.} The bending angle of a light ray passing a mass $M$
+  with impact parameter $b$ is:
+  \begin{equation*}
+    \Delta\phi = \frac{4M}{b}
+  \end{equation*}
+  Calculate $\Delta\phi$ (in arcseconds) for starlight grazing the limb of the Sun
+  ($M_{\odot} = 1.477$ km in geometric units, $R_{\odot} \approx 6.96 \times 10^{5}$ km).
+  Compare with the Newtonian prediction ($\Delta\phi = 2M/b$).
+\end{exbox}
+
+\begin{exbox}[label=ex:app2]
+  \textbf{Precession of Mercury's perihelion.} Mercury's orbital parameters are
+  $a \approx 5.79 \times 10^{7}$ km, eccentricity $e \approx 0.2056$.
+  Using equation~\eqref{eq:perihelion}, calculate the predicted perihelion
+  advance per century. (Mercury's orbital period is about 0.2408 years, and
+  $M_{\odot} = 1.477$ km.)
+\end{exbox}
+
+\begin{exbox}[label=ex:app3]
+  \textbf{Gravitational time dilation.} An astronaut hovers at $r = 4M$ above a
+  Schwarzschild black hole, while Mission Control monitors from $r \to \infty$.
+  If the astronaut's clock ticks off 1 hour, how much coordinate time $t$
+  elapses at infinity?
+\end{exbox}
+
+\begin{exbox}[label=ex:app4]
+  \textbf{ISCO.} Derive the innermost stable circular orbit $r_{\text{ISCO}} = 6M$
+  from the effective potential~\eqref{eq:eff-potential}. Show that the binding energy
+  (the energy per unit mass required to escape from the ISCO to infinity) is
+  $1 - \sqrt{8/9} \approx 0.0572$.
+\end{exbox}
+
+\begin{exbox}[label=ex:app5]
+  \textbf{Infalling observer.} An observer falls radially from rest at infinity
+  into a Schwarzschild black hole.
+  \begin{enumerate}[label=(\alph*)]
+    \item Show that the proper time to fall from $r = R$ to $r = 2M$ is
+          $\displaystyle \Delta\tau = \frac{2}{3\sqrt{2M}}\big(R^{3/2} - (2M)^{3/2}\big)$.
+    \item Compute $\Delta\tau$ from $r=10M$ to $r=2M$ in seconds for a black hole
+          of $10\,M_{\odot}$.
+    \item Show that the coordinate time $t$ for this journey diverges logarithmically
+          as $r \to 2M$. What does an external observer see?
+  \end{enumerate}
+\end{exbox}
+
+\begin{exbox}[label=ex:app6]
+  \textbf{Photon sphere.} Show that massless particles (photons) can orbit at
+  $r = 3M$. Is this orbit stable? Compute the period of a photon orbit for a
+  $10\,M_{\odot}$ black hole.
+\end{exbox}
+
+% ============================================================
+%  APPENDIX: SOLUTIONS TO SELECTED EXERCISES
+% ============================================================
+\appendix
+\section{Solutions to Selected Exercises}
+
+\subsection*{Solution~\ref{ex:warmup1} --- Symmetry Assumptions}
+
+We assume the spacetime is \textbf{spherically symmetric} (invariant under rotations of the
+2-sphere) and \textbf{static} (invariant under time translations and time reversal).
+Spherical symmetry forces the angular part of the metric to be $r^{2}d\Omega^{2}$, where
+$r$ is the areal radius (defined so that a sphere of constant $r$ has surface area
+$4\pi r^{2}$). The static assumption forces the metric to be time-independent and
+diagonal (the $dt\,dr$ cross-term vanishes). Birkhoff's theorem later proves that
+stationarity (and therefore staticity) follows from spherical symmetry in vacuum---we
+did not \emph{have} to assume it, but it simplifies the derivation.
+
+\subsection*{Solution~\ref{ex:warmup2} --- Singularities}
+
+$r = 0$ is a \textbf{curvature singularity}: the Kretschmann scalar
+$\mathcal{K} = 48M^{2}/r^{6}$ diverges, meaning tidal forces become infinite.
+No coordinate transformation can remove it.
+
+$r = 2M$ is a \textbf{coordinate singularity}: $\mathcal{K}$ remains finite
+($48M^{2}/(2M)^{6} = 3/(4M^{4})$), and the Kruskal--Szekeres extension demonstrates
+that spacetime is perfectly regular there. The singularity in the Schwarzschild
+coordinates is an artifact of those coordinates becoming ill-defined at the horizon.
+
+\subsection*{Solution~\ref{ex:derive4} --- $\alpha' + \beta' = 0$}
+
+From $R_{tt}=0$: $\alpha'' + \alpha'^{2} - \alpha'\beta' + 2\alpha'/r = 0$.
+
+From $R_{rr}=0$: $\alpha'' + \alpha'^{2} - \alpha'\beta' - 2\beta'/r = 0$.
+
+Subtracting: $2\alpha'/r + 2\beta'/r = 0$, so $\alpha' + \beta' = 0$.
+
+Integrating: $\alpha(r) + \beta(r) = C$. As $r \to \infty$, asymptotic flatness
+requires $g_{tt} \to -1$ and $g_{rr} \to 1$, i.e., $\alpha,\beta \to 0$. Hence $C = 0$.
+
+\subsection*{Solution~\ref{ex:derive5} --- Solving for $e^{2\alpha}$}
+
+$R_{\theta\theta}=0$ gives $\frac{d}{dr}(re^{2\alpha}) = 1$.
+Integrating: $re^{2\alpha} = r - 2M$.
+Thus $e^{2\alpha} = 1 - 2M/r$.
+As $r \to \infty$, $e^{2\alpha} \to 1$, consistent with asymptotic flatness.
+
+\subsection*{Solution~\ref{ex:app1} --- Light Deflection}
+
+In geometric units, $M_{\odot} = 1.477$ km, $b = R_{\odot} = 6.96 \times 10^{5}$ km.
+
+$\Delta\phi = 4M/b = 4(1.477)/(6.96 \times 10^{5}) = 8.49 \times 10^{-6}$ radians.
+
+In arcseconds: $\Delta\phi = 8.49 \times 10^{-6} \times (180/\pi) \times 3600
+\approx 1.75''$.
+
+The Newtonian prediction (treating light as having some effective mass) gives
+$2M/b = 0.875''$, half the relativistic value. The 1919 Eddington expedition
+confirmed the relativistic prediction.
+
+\subsection*{Solution~\ref{ex:app3} --- Gravitational Time Dilation}
+
+For a stationary observer at $r = 4M$: $d\tau = \sqrt{1 - 2M/4M}\,dt = \sqrt{1 - 1/2}\,dt = \sqrt{1/2}\,dt$.
+
+So $dt = \sqrt{2}\,d\tau$. For $d\tau = 1$ hour, the coordinate time elapsed is
+$dt = \sqrt{2} \approx 1.414$ hours.
+
+\subsection*{Solution~\ref{ex:app4} --- ISCO Derivation}
+
+$V_{\text{eff}}(r) = -M/r + L^{2}/(2r^{2}) - ML^{2}/r^{3}$.
+
+Setting $V'_{\text{eff}}(r_{c}) = 0$: $M/r_{c}^{2} - L^{2}/r_{c}^{3} + 3ML^{2}/r_{c}^{4} = 0$.
+Multiplying by $r_{c}^{4}$: $Mr_{c}^{2} - L^{2}r_{c} + 3ML^{2} = 0$, so
+$L^{2} = Mr_{c}^{2}/(r_{c} - 3M)$.
+
+For stability, $V''_{\text{eff}} \geq 0$. Computing:
+$V''_{\text{eff}}(r) = -2M/r^{3} + 3L^{2}/r^{4} - 12ML^{2}/r^{5}$.
+Substituting $L^{2}$ and setting $V''_{\text{eff}} = 0$ at $r = r_{\text{ISCO}}$ gives
+$r_{\text{ISCO}} = 6M$.
+
+Energy at ISCO: $E^{2} = 1 - 2M/r + L^{2}/r^{2} - 2ML^{2}/r^{3}$ evaluated at $r = 6M$, $L^{2} = 12M^{2}$:
+$E^{2} = 1 - 1/3 + 1/3 - 1/9 = 8/9$, so $E = \sqrt{8/9}$.
+Binding energy $= 1 - E = 1 - \sqrt{8/9} \approx 0.0572$ (i.e., $5.72\%$ of rest mass energy).
+
+\end{document}

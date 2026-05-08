@@ -1,0 +1,43 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.idx
+*.ilg
+*.ind
+*.xdv
+*.bak
+*.sav
+*.ptc
+*.glg
+*.glo
+*.gls
+*.ist
+*.maf
+*.mtc
+*.mtc0
+
+# PDF output (uncomment to ignore PDFs)
+*.pdf
+
+# Editor files
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Build directory (if used)
+build/
