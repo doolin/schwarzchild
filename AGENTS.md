@@ -33,6 +33,36 @@ agent handles LaTeX structure, typesetting, build pipeline, and
 exercise design. Write only what you understand — don't guess at
 physics.
 
+## Session start
+
+At the start of each session, read the three working files and
+the scroll to orient:
+
+1. `.development/todo.md` — what's active and what's blocked
+2. `.development/planning.md` — current priorities and open questions
+3. `.development/backlog.md` — what's waiting
+4. `.development/scroll.md` — how Karl writes (loaded via
+   `opencode.json` as a persistent instruction)
+
+Present a short summary before starting work.
+
+## Project management
+
+Lightweight, self-hosted project management lives in
+`.development/` — no external tools, no ticketing system.
+Modeled on the `self-host-development-light` skill from
+`doolin/dave-skills`.
+
+- **`backlog.md`** — items not yet scheduled. Newest at top.
+- **`planning.md`** — high-level direction, priorities, open
+  questions, recent decisions.
+- **`todo.md`** — active and blocked work. Keep short.
+- **`plans/`** — saved plans worth revisiting (reference only).
+- **`scroll.md`** — the project conscience: how Karl writes,
+  why no step is skipped.
+
+One source of truth per item — an item lives in exactly one file.
+
 ## Software workflow
 
 These conventions adapt the `software-development-workflow` skill
@@ -83,6 +113,9 @@ Fix broken cross-reference in <section>
 ```
 Refactor exercise numbering
 ```
+
+Attribution for agent contribution:
+Coauthored by: Karl via <client> with <model>
 
 ### 6. Merge — Developer
 
